@@ -65,19 +65,34 @@ fs.stat(pathassetcNew, (err) => { // сheck the existence of the folder assets
 });
 function mkd(){
   fsPromises.mkdir(pathassetcNew, {recursive: true}); //created folder assets in project-dist
+  function create(folderpath, folderpathNew){   
+    fs.readdir(folderpath, {encoding:'utf-8', withFileTypes: true}, (err, array) => {
+      for (let elem of array){
+        if(elem.isDirectory()){
+          fsPromises.mkdir(path.join(folderpathNew, elem.name), {recursive: true});
+          create(path.join(folderpath, elem.name), path.join(folderpathNew, elem.name));  // recursive function
+        }else{
+          fs.copyFile(path.join(folderpath, elem.name), path.join(folderpathNew, elem.name), (err) => {
+            if(err) throw err;
+          });
+        }        
+      }
+    });
+  }
+  create(pathassetc, pathassetcNew);
 }
-function create(folderpath, folderpathNew){   
-  fs.readdir(folderpath, {encoding:'utf-8', withFileTypes: true}, (err, array) => {
-    for (let elem of array){
-      if(elem.isDirectory()){
-        fsPromises.mkdir(path.join(folderpathNew, elem.name), {recursive: true});
-        create(path.join(folderpath, elem.name), path.join(folderpathNew, elem.name));  // recursive function
-      }else{
-        fs.copyFile(path.join(folderpath, elem.name), path.join(folderpathNew, elem.name), (err) => {
-          if(err) throw err;
-        });
-      }        
-    }
-  });
-}
-create(pathassetc, pathassetcNew);
+// function create(folderpath, folderpathNew){   
+//   fs.readdir(folderpath, {encoding:'utf-8', withFileTypes: true}, (err, array) => {
+//     for (let elem of array){
+//       if(elem.isDirectory()){
+//         fsPromises.mkdir(path.join(folderpathNew, elem.name), {recursive: true});
+//         create(path.join(folderpath, elem.name), path.join(folderpathNew, elem.name));  // recursive function
+//       }else{
+//         fs.copyFile(path.join(folderpath, elem.name), path.join(folderpathNew, elem.name), (err) => {
+//           if(err) throw err;
+//         });
+//       }        
+//     }
+//   });
+// }
+// create(pathassetc, pathassetcNew);
